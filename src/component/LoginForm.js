@@ -4,6 +4,11 @@ import { Card, CardSection, Button, EntryText } from './reusable';
 class LoginForm extends Component {
   state = { email: '', password: '' };
 
+  onButtonPress()
+  {
+    const { email, password }=this.state;
+  }
+
   render() {
     return (
       <Card>
@@ -25,8 +30,8 @@ class LoginForm extends Component {
            />
         </CardSection>
         <CardSection>
-            <Button onTouch={() => console.log('test')}>
-                Login
+            <Button>
+                LOGIN
             </Button>
         </CardSection>
       </Card>
