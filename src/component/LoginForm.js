@@ -1,26 +1,58 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
 import { Text } from 'react-native';
-import { Card, CardSection, Button, EntryText } from './reusable';
+import { Card, CardSection, Button, EntryText, Spinner } from './reusable';
 
 
 class LoginForm extends Component {
-  state = { email: '', password: '', error: '' };
+  state = { email: '', password: '', error: '', loading: false };
 
   onTouchButton() {
+    // VARIABLES
     const { email, password } = this.state;
+    this.setState({ error: '', loading: true });
+
     try {
       firebase.auth().signInWithEmailAndPassword(email, password)
+      .then(this.onLoggingSuccess.bind(this))
       .catch(() => {
           firebase.auth().createUserWithEmailAndPassword(email, password)
-          .catch(() => {
-             console.log(email + password);
-             this.setState({ error: 'Authentication failed' });
-          });
+          .then(this.onLoggingSuccess.bind(this))
+          .catch(this.onLoggingFail.bind(this));
       });
     } catch (e) {
       console.log(e.toString());
     }
+  }
+
+  onLoggingFail() {
+    this.setState({
+      email: '',
+      password: '',
+      loading: false,
+      error: 'Auth Fail'
+    });
+  }
+
+
+  onLoggingSuccess() {
+    this.setState({
+      email: '',
+      password: '',
+      loading: false,
+      error: ''
+    });
+  }
+
+  renderButton() {
+    if (this.state.loading) {
+      return <Spinner size="small" />;
+    }
+    return (
+      <Button onTouch={this.onTouchButton.bind(this)}>
+          LOGIN
+      </Button>
+    );
   }
 
   render() {
@@ -47,9 +79,7 @@ class LoginForm extends Component {
            <Text style={styles.containerStyle}>{this.state.error}</Text>
         </CardSection>
         <CardSection>
-            <Button onTouch={this.onTouchButton.bind(this)}>
-                LOGIN
-            </Button>
+           {this.renderButton()}
         </CardSection>
       </Card>
     );
